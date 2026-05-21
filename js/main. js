@@ -1,0 +1,83 @@
+here/* إدارة الأحداث وإظهار النوافذ المنبثقة التفاعلية */
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // جلب عناصر الأزرار التفاعلية من الصفحة
+    const allButtons = document.querySelectorAll('.btn-nav, .btn-main, .btn-small');
+
+    // إضافة حدث النقر لقراءة الرسائل ديناميكياً
+    allButtons.forEach(function(button) {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            
+            const customMessage = button.getAttribute('data-message') || "This premium collection will be available shortly.";
+            showPremiumAlert(customMessage);
+        });
+    });
+
+    // دالة إنشاء نافذة التنبيه المخصصة وحقنها في الواجهة
+    function showPremiumAlert(messageContent) {
+        // إنشاء الخلفية المظلمة الشفافة
+        const overlay = document.createElement('div');
+        overlay.setAttribute('style', `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(4px);
+        `);
+
+        // إنشاء نافذة المحتوى وتنسيقها
+        const box = document.createElement('div');
+        box.setAttribute('style', `
+            background-color: #ffffff;
+            padding: 35px 40px;
+            border-radius: 20px;
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(169, 75, 104, 0.15);
+            border: 1px solid #f5eaed;
+            font-family: 'Montserrat', sans-serif;
+            animation: popupScale 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        `);
+        
+        box.innerHTML = `
+            <h2 style="color: #a94b68; font-size: 22px; font-weight: 700; margin-bottom: 18px; letter-spacing: 0.5px;">GlamourBeauty</h2>
+            <p style="color: #333333; font-size: 15px; margin-bottom: 25px; line-height: 1.6; font-weight: 400;">
+                ${messageContent}
+            </p>
+            <button class="alert-close-btn" style="background-color: #a94b68; color: #ffffff; border: none; padding: 12px 35px; border-radius: 25px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(169, 75, 104, 0.2);">Accept & Close</button>
+        `;
+
+        // إنشاء تأثيرات الحركات وتأثير التحويم برمجياً
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
+            @keyframes popupScale { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+            .alert-close-btn:hover { background-color: #8c3b54 !important; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(169, 75, 104, 0.3) !important; }
+        `;
+        document.head.appendChild(styleSheet);
+
+        overlay.appendChild(box);
+        document.body.appendChild(overlay);
+
+        // إغلاق النافذة عند النقر على الزر
+        box.querySelector('.alert-close-btn').addEventListener('click', function() {
+            overlay.remove();
+            styleSheet.remove();
+        });
+
+        // إغلاق النافذة عند النقر خارج صندوق المحتوى
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) {
+                overlay.remove();
+                styleSheet.remove();
+            }
+        });
+    }
+});
